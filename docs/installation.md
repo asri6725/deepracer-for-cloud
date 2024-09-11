@@ -54,14 +54,14 @@ The installation script will adapt `.profile` to ensure that all settings are ap
 
 **For local install** it is recommended *not* to run the `bin/prepare.sh` script; it might do more changes than what you want. Rather ensure that all prerequisites are set up and run `bin/init.sh` directly.
 
+See also the [following article](https://awstip.com/deepracer-for-cloud-drfc-local-setup-3c6418b2c75a) for guidance.
+
 The Init Script takes a few parameters:
 
 | Variable | Description |
 |----------|-------------|
 | `-c <cloud>` | Sets the cloud version to be configured, automatically updates the `DR_CLOUD` parameter in `system.env`. Options are `azure`, `aws` or `local`. Default is `local` |
 | `-a <arch>` | Sets the architecture to be configured. Either `cpu` or `gpu`. Default is `gpu`. |
-
-*TODO: Document how to configure via cloud-init.*
 
 ## Environment Setup
 
@@ -108,23 +108,7 @@ For access with IAM user:
 
 ### Azure
 
-In Azure mode the script-set requires the following:
-
-* A storage account with a blob container set up with access keys:
-  * Use `aws configure --profile <myprofile>` to configure this into a specific profile.
-  * `<myprofile>` can be defined by the user, but do not use `default`.
-    * Access Key ID is the Storage Account name.
-    * Secret Access Key is the Access Key for the Storage Account.
-  * The blob container is equivalent to the S3 bucket.
-* A real AWS IAM user configured with `aws configure` to enable upload of models into AWS DeepRacer.
-* Configure `system.env` as follows:
-  * `DR_LOCAL_S3_PROFILE=default`
-  * `DR_LOCAL_S3_BUCKET=<bucketname>`
-  * `DR_UPLOAD_S3_PROFILE=default`
-  * `DR_UPLOAD_S3_BUCKET=<your-aws-deepracer-bucket>`
-* Run `dr-update` for configuration to take effect.
-
-As Azure does not natively support S3 a [minio](https://min.io/product/overview) proxy is set up on port 9000 to allow the containers to communicate and store models.
+Minio has deprecated the gateway feature that exposed an Azure Blob Storage as an S3 bucket. Azure mode now sets up minio in the same way as in local mode.
 
 If you want to use awscli (`aws`) to manually move files then use `aws $DR_LOCAL_PROFILE_ENDPOINT_URL s3 ...`, as this will set both `--profile` and `--endpoint-url` parameters to match your configuration.
 
@@ -164,7 +148,7 @@ Here are some hints for troubleshooting specific issues you may encounter
 
 | Issue        | Troubleshooting hint |
 |------------- | ---------------------|
-Get messages like "Sagemaker is not running" | Run `docker -ps a` to see if the containers are running or if they stopped due to some errors
+Get messages like "Sagemaker is not running" | Run `docker -ps a` to see if the containers are running or if they stopped due to some errors. If running after a fresh install, try restarting the system.
 Check docker errors for specific container | Run `docker logs -f <containerid>`
 Get message "Error response from daemon: could not choose an IP address to advertise since this system has multiple addresses on interface <your_interface> ..." when running `./bin/init.sh -c local -a cpu` | It means you have multiple IP addresses and you need to specify one within `./bin/init.sh`.<br> If you don't care which one to use, you can get the first one by running ```ifconfig \| grep $(route \| awk '/^default/ {print $8}') -a1 \| grep -o -P '(?<=inet ).*(?= netmask)```.<br> Edit   `./bin/init.sh` and locate line `docker swarm init` and change it to `docker swarm init --advertise-addr <your_IP>`.<br> Rerun  `./bin/init.sh -c local -a cpu`
 I don't have any of the `dr-*` commands | Run `source bin/activate.sh`.

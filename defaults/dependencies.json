@@ -1,8 +1,6 @@
 {
-    "master_version": "5.1",
+    "master_version": "5.3",
     "containers": {
-        "rl_coach": "5.1.0",
-        "robomaker": "5.1.0",
-        "sagemaker": "5.1.0"
+        "simapp": "5.3.1"
     }
 }
