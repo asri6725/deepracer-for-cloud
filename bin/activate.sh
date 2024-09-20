@@ -46,7 +46,7 @@ function dr-update-env {
 
   # Setting the default region to ensure that things work also in the
   # non default regions.
-  export AWS_DEFAULT_REGION=${DR_AWS_APP_REGION}
+  export AWS_DEFAULT_REGION=ap-southeast-2
 
 }
 

@@ -14,3 +14,6 @@ autorun.s3url
 nohup.out
 /*.sh
 _
+awscreds.txt
+.terraform*
+terraform-provider
